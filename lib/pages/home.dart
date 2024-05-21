@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -13,11 +13,29 @@ class MyHomePage extends StatefulWidget {
   // always marked "final".
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<HomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<HomePage> {
 
+  void addNewExpense()
+  {
+    showDialog(
+        context: context,
+        builder: (context) => const AlertDialog(
+          title: Text('Add New Expense'),
+          content: Column(
+          children: [
+            //expense name
+            TextField(),
+            // expense amount
+            TextField(),
+            // expense date
+
+          ],
+          ),
+        ));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +45,13 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    return Scaffold();
+    return Scaffold(
+      backgroundColor: Colors.blue,
+      floatingActionButton: FloatingActionButton
+        (
+        onPressed: addNewExpense,
+        child: Icon(Icons.add),
+      ),
+    );
   }
 }
