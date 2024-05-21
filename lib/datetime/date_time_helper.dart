@@ -1,4 +1,4 @@
-// convery a DateTime to a string in format - yyyy/mm/dd
+// convert a DateTime to a string in format - yyyy/mm/dd
 
 String convertDateTimeToString(DateTime dateTime)
 {

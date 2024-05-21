@@ -1,56 +1,97 @@
+import 'package:budget_app/components/expense_tile.dart';
+import 'package:budget_app/data/expense_data.dart';
+import 'package:budget_app/models/expense_item.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
 
   @override
   State<HomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<HomePage> {
+  final newExpenseNameController = TextEditingController();
+  final newExpenseAmountController = TextEditingController();
 
-  void addNewExpense()
-  {
+  //addNewExpense Method
+  void addNewExpense() {
     showDialog(
         context: context,
-        builder: (context) => const AlertDialog(
-          title: Text('Add New Expense'),
-          content: Column(
-          children: [
-            //expense name
-            TextField(),
-            // expense amount
-            TextField(),
-            // expense date
+        builder: (context) => AlertDialog(
+              title: Text('Add New Expense'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  //expense name
+                  TextField(
+                    controller: newExpenseNameController,
+                  ),
+                  // expense amount
+                  TextField(
+                    controller: newExpenseAmountController,
+                  ),
+                  // expense date
+                ],
+              ),
+              actions: [
+                //save button
+                MaterialButton(
+                  onPressed: save,
+                  child: Text('Save'),
+                ),
 
-          ],
-          ),
-        ));
+                //cancel button
+                MaterialButton(
+                  onPressed: cancel,
+                  child: Text('Cancel'),
+                )
+              ],
+            ));
+  }
+
+  void save() {
+    ExpenseItem newExpenseItem = ExpenseItem(
+      name: newExpenseNameController.text,
+      amount: newExpenseAmountController.text,
+      dateTime: DateTime.now(),
+    );
+
+    Provider.of<ExpenseData>(context, listen: false)
+        .addNewExpense(newExpenseItem);
+
+    Navigator.pop(context);
+    clear();
+  }
+
+  void cancel() {
+    Navigator.pop(context);
+    clear();
+  }
+
+  void clear() {
+    newExpenseAmountController.clear();
+    newExpenseNameController.clear();
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      backgroundColor: Colors.blue,
-      floatingActionButton: FloatingActionButton
-        (
-        onPressed: addNewExpense,
-        child: Icon(Icons.add),
+    return Consumer<ExpenseData>(
+      builder: (context, value, child) => Scaffold(
+        backgroundColor: Colors.grey,
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.blue,
+          onPressed: addNewExpense,
+          child: Icon(Icons.add),
+        ),
+        body: ListView.builder(
+          itemCount: value.getOverallExpenses().length,
+          itemBuilder: (context, index) => ExpenseTile(
+              name: value.getOverallExpenses()[index].name,
+              amount: value.getOverallExpenses()[index].amount,
+              dateTime: value.getOverallExpenses()[index].dateTime),
+        ),
       ),
     );
   }
