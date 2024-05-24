@@ -1,3 +1,4 @@
+import 'package:budget_app/components/expense_summary.dart';
 import 'package:budget_app/components/expense_tile.dart';
 import 'package:budget_app/data/expense_data.dart';
 import 'package:budget_app/models/expense_item.dart';
@@ -13,7 +14,15 @@ class HomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<HomePage> {
   final newExpenseNameController = TextEditingController();
-  final newExpenseAmountController = TextEditingController();
+  final newExpensePoundController = TextEditingController();
+  final newExpensePenceController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    Provider.of<ExpenseData>(context, listen: false).prepareData();
+  }
 
   //addNewExpense Method
   void addNewExpense() {
@@ -27,10 +36,35 @@ class _MyHomePageState extends State<HomePage> {
                   //expense name
                   TextField(
                     controller: newExpenseNameController,
+                    decoration: const InputDecoration(
+                      hintText: "Expense Name",
+                    ),
                   ),
                   // expense amount
-                  TextField(
-                    controller: newExpenseAmountController,
+                  Row(
+                    children: [
+                      //pounds
+                      Expanded(
+                        child: TextField(
+                          controller: newExpensePoundController,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            hintText: "Pounds",
+                          ),
+                        ),
+                      ),
+
+                      //pence
+                      Expanded(
+                        child: TextField(
+                          controller: newExpensePenceController,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            hintText: "Pence",
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   // expense date
                 ],
@@ -51,15 +85,28 @@ class _MyHomePageState extends State<HomePage> {
             ));
   }
 
-  void save() {
-    ExpenseItem newExpenseItem = ExpenseItem(
-      name: newExpenseNameController.text,
-      amount: newExpenseAmountController.text,
-      dateTime: DateTime.now(),
-    );
+  // delete expense
 
-    Provider.of<ExpenseData>(context, listen: false)
-        .addNewExpense(newExpenseItem);
+  void deleteExpense(ExpenseItem expenseItem) {
+    Provider.of<ExpenseData>(context, listen: false).deleteExpense(expenseItem);
+  }
+
+  void save() {
+    if (newExpenseNameController.text.isNotEmpty &&
+        newExpensePoundController.text.isNotEmpty &&
+        newExpensePenceController.text.isNotEmpty) {
+
+      String amount =
+          newExpensePoundController.text + '.' + newExpensePenceController.text;
+      ExpenseItem newExpenseItem = ExpenseItem(
+        name: newExpenseNameController.text,
+        amount: amount,
+        dateTime: DateTime.now(),
+      );
+
+      Provider.of<ExpenseData>(context, listen: false)
+          .addNewExpense(newExpenseItem);
+    }
 
     Navigator.pop(context);
     clear();
@@ -71,7 +118,8 @@ class _MyHomePageState extends State<HomePage> {
   }
 
   void clear() {
-    newExpenseAmountController.clear();
+    newExpensePoundController.clear();
+    newExpensePenceController.clear();
     newExpenseNameController.clear();
   }
 
@@ -79,20 +127,32 @@ class _MyHomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Consumer<ExpenseData>(
       builder: (context, value, child) => Scaffold(
-        backgroundColor: Colors.grey,
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.blue,
-          onPressed: addNewExpense,
-          child: Icon(Icons.add),
-        ),
-        body: ListView.builder(
-          itemCount: value.getOverallExpenses().length,
-          itemBuilder: (context, index) => ExpenseTile(
-              name: value.getOverallExpenses()[index].name,
-              amount: value.getOverallExpenses()[index].amount,
-              dateTime: value.getOverallExpenses()[index].dateTime),
-        ),
-      ),
+          backgroundColor: Colors.white,
+          floatingActionButton: FloatingActionButton(
+            backgroundColor: Colors.blue,
+            onPressed: addNewExpense,
+            child: Icon(Icons.add),
+          ),
+          body: ListView(
+            children: [
+              //weekly summary
+              ExpenseSummary(startOfWeek: value.startOfWeekDate()),
+
+              //expense List
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: value.getOverallExpenses().length,
+                itemBuilder: (context, index) => ExpenseTile(
+                  name: value.getOverallExpenses()[index].name,
+                  amount: value.getOverallExpenses()[index].amount,
+                  dateTime: value.getOverallExpenses()[index].dateTime,
+                  deleteTapped: (p0) =>
+                      deleteExpense(value.getOverallExpenses()[index]),
+                ),
+              ),
+            ],
+          )),
     );
   }
 }

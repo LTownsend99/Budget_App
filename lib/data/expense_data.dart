@@ -1,6 +1,7 @@
 import 'package:budget_app/datetime/date_time_helper.dart';
 import 'package:budget_app/models/expense_item.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:budget_app/data/hive_database.dart';
 
 class ExpenseData extends ChangeNotifier{
   // list ALL expenses
@@ -13,12 +14,24 @@ class ExpenseData extends ChangeNotifier{
     return overallExpenses;
   }
 
+  //prepare data to display
+  final db = HiveDataBase();
+
+  void prepareData(){
+
+    if(db.readData().isNotEmpty)
+    {
+      overallExpenses = db.readData();
+    }
+  }
+
   // add new expense
 
   void addNewExpense(ExpenseItem expenseItem) {
     overallExpenses.add(expenseItem);
 
     notifyListeners();
+    db.saveData(overallExpenses);
   }
 
   // delete expense
@@ -27,6 +40,7 @@ class ExpenseData extends ChangeNotifier{
     overallExpenses.remove(expenseItem);
 
     notifyListeners();
+    db.saveData(overallExpenses);
   }
 
 //get weekday from a dataTime object
