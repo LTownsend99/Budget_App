@@ -4,10 +4,18 @@ import 'package:budget_app/graphs/daily_bar_graph.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ExpenseSummary extends StatelessWidget {
+class ExpenseSummary extends StatefulWidget {
   final DateTime startOfWeek;
 
-  const ExpenseSummary({super.key, required this.startOfWeek});
+  ExpenseSummary({Key? key, required this.startOfWeek}) : super(key: key);
+
+  @override
+  ExpenseSummaryState createState() => ExpenseSummaryState();
+}
+
+class ExpenseSummaryState extends State<ExpenseSummary> {
+  String weekTotal = '0.00';
+  double totalExpenses = 0;
 
   double calculateMax(
       ExpenseData value,
@@ -30,10 +38,10 @@ class ExpenseSummary extends StatelessWidget {
       value.calculateDailyExpenseSummary()[sunday] ?? 0,
     ];
 
-    //sort values smallest to largest
+    // Sort values smallest to largest
     values.sort();
 
-    // increase slightly so the bar is never full
+    // Increase slightly so the bar is never full
     max = values.last * 1.1;
 
     return max == 0 ? 100 : max;
@@ -63,68 +71,84 @@ class ExpenseSummary extends StatelessWidget {
       total += values[i];
     }
 
-    return total.toStringAsFixed(2);
+    weekTotal = total.toStringAsFixed(2);
+    totalExpenses += double.parse(weekTotal);
+    return weekTotal;
+  }
+
+  String getWeekTotal() {
+    return weekTotal;
+  }
+
+  double getTotalExpenses()
+  {
+    return totalExpenses;
   }
 
   @override
   Widget build(BuildContext context) {
-    //get yyyymmdd for each day of the week
-
-    String monday =
-        convertDateTimeToString(startOfWeek.add(const Duration(days: 0)));
-    String tuesday =
-        convertDateTimeToString(startOfWeek.add(const Duration(days: 1)));
-    String wednesday =
-        convertDateTimeToString(startOfWeek.add(const Duration(days: 2)));
-    String thursday =
-        convertDateTimeToString(startOfWeek.add(const Duration(days: 3)));
-    String friday =
-        convertDateTimeToString(startOfWeek.add(const Duration(days: 4)));
-    String saturday =
-        convertDateTimeToString(startOfWeek.add(const Duration(days: 5)));
-    String sunday =
-        convertDateTimeToString(startOfWeek.add(const Duration(days: 6)));
+    // Get yyyymmdd for each day of the week
+    String monday = convertDateTimeToString(
+        widget.startOfWeek.add(const Duration(days: 0)));
+    String tuesday = convertDateTimeToString(
+        widget.startOfWeek.add(const Duration(days: 1)));
+    String wednesday = convertDateTimeToString(
+        widget.startOfWeek.add(const Duration(days: 2)));
+    String thursday = convertDateTimeToString(
+        widget.startOfWeek.add(const Duration(days: 3)));
+    String friday = convertDateTimeToString(
+        widget.startOfWeek.add(const Duration(days: 4)));
+    String saturday = convertDateTimeToString(
+        widget.startOfWeek.add(const Duration(days: 5)));
+    String sunday = convertDateTimeToString(
+        widget.startOfWeek.add(const Duration(days: 6)));
 
     return Consumer<ExpenseData>(
-        builder: (context, value, child) => Column(
-              children: [
-                //week total
-                Padding(
-                  padding: const EdgeInsets.all(25.0),
-                  child: Row(
-                    children: [
-                      const Text(
-                        'Week Total: ',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Text('\£${calculateWeekTotal(value, monday, tuesday, wednesday,
-                          thursday, friday, saturday, sunday)}'),
-                    ],
-                  ),
-                ),
+      builder: (context, value, child) {
+        // Calculate the week total to update the weekTotal variable
+        weekTotal = calculateWeekTotal(value, monday, tuesday, wednesday,
+            thursday, friday, saturday, sunday);
 
-                //bar graph
-                SizedBox(
-                    height: 200,
-                    child: DailyBarGraph(
-                      maxY: calculateMax(value, monday, tuesday, wednesday,
-                          thursday, friday, saturday, sunday),
-                      mondayAmount:
-                          value.calculateDailyExpenseSummary()[monday] ?? 0,
-                      tuesdayAmount:
-                          value.calculateDailyExpenseSummary()[tuesday] ?? 0,
-                      wednesdayAmount:
-                          value.calculateDailyExpenseSummary()[wednesday] ?? 0,
-                      thursdayAmount:
-                          value.calculateDailyExpenseSummary()[thursday] ?? 0,
-                      fridayAmount:
-                          value.calculateDailyExpenseSummary()[friday] ?? 0,
-                      saturdayAmount:
-                          value.calculateDailyExpenseSummary()[saturday] ?? 0,
-                      sundayAmount:
-                          value.calculateDailyExpenseSummary()[sunday] ?? 0,
-                    )),
-              ],
-            ));
+        return Column(
+          children: [
+            // Week total
+            Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: Row(
+                children: [
+                  const Text(
+                    'Week Total: ',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Text('\£$weekTotal'),
+                ],
+              ),
+            ),
+
+            // Bar graph
+            SizedBox(
+                height: 200,
+                child: DailyBarGraph(
+                  maxY: calculateMax(value, monday, tuesday, wednesday,
+                      thursday, friday, saturday, sunday),
+                  mondayAmount:
+                      value.calculateDailyExpenseSummary()[monday] ?? 0,
+                  tuesdayAmount:
+                      value.calculateDailyExpenseSummary()[tuesday] ?? 0,
+                  wednesdayAmount:
+                      value.calculateDailyExpenseSummary()[wednesday] ?? 0,
+                  thursdayAmount:
+                      value.calculateDailyExpenseSummary()[thursday] ?? 0,
+                  fridayAmount:
+                      value.calculateDailyExpenseSummary()[friday] ?? 0,
+                  saturdayAmount:
+                      value.calculateDailyExpenseSummary()[saturday] ?? 0,
+                  sundayAmount:
+                      value.calculateDailyExpenseSummary()[sunday] ?? 0,
+                )),
+          ],
+        );
+      },
+    );
   }
 }

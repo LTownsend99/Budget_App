@@ -3,52 +3,47 @@ import 'package:budget_app/models/expense_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:budget_app/data/hive_database.dart';
 
-class ExpenseData extends ChangeNotifier{
-  // list ALL expenses
-
+class ExpenseData extends ChangeNotifier {
+  // List of all expenses
   List<ExpenseItem> overallExpenses = [];
 
-  //get expense list
-
+  // Get overall expenses
   List<ExpenseItem> getOverallExpenses() {
     return overallExpenses;
   }
 
-  //prepare data to display
+  // Prepare data to display
   final db = HiveDataBase();
 
-  void prepareData(){
-
-    if(db.readData().isNotEmpty)
-    {
+  void prepareData() {
+    if (db.readData().isNotEmpty) {
       overallExpenses = db.readData();
     }
   }
 
-  // add new expense
-
+  // Add new expense
   void addNewExpense(ExpenseItem expenseItem) {
     overallExpenses.add(expenseItem);
-
     notifyListeners();
     db.saveData(overallExpenses);
   }
 
-  // delete expense
-
+  // Delete expense
   void deleteExpense(ExpenseItem expenseItem) {
     overallExpenses.remove(expenseItem);
-
     notifyListeners();
     db.saveData(overallExpenses);
   }
 
-//get weekday from a dataTime object
+  // Calculate total expenses
+  double getTotalExpenses() {
+    return overallExpenses.fold(
+        0, (sum, item) => sum + double.parse(item.amount));
+  }
 
-  String getDay(DateTime dateTime)
-  {
-    switch(dateTime.weekday)
-    {
+  // Get weekday from a DateTime object
+  String getDay(DateTime dateTime) {
+    switch (dateTime.weekday) {
       case 1:
         return 'Monday';
       case 2:
@@ -68,51 +63,35 @@ class ExpenseData extends ChangeNotifier{
     }
   }
 
-// get the date for start of the week - always find the closed sunday
-
-  DateTime startOfWeekDate()
-  {
+  // Get the date for the start of the week - always find the closest Sunday
+  DateTime startOfWeekDate() {
     DateTime? startOfWeek;
-
-    // find today's date
     DateTime today = DateTime.now();
 
-    //find sunday by going backwards from today
-    for (int i = 0; i < 7; i++)
-      {
-        if(getDay(today.subtract(Duration(days: i))) == 'Sunday')
-          {
-            startOfWeek = today.subtract(Duration(days: i));
-          }
+    for (int i = 0; i < 7; i++) {
+      if (getDay(today.subtract(Duration(days: i))) == 'Monday') {
+        startOfWeek = today.subtract(Duration(days: i));
       }
+    }
 
     return startOfWeek!;
   }
 
-// convert overall list into daily summary's
+  // Convert overall list into daily summaries
+  Map<String, double> calculateDailyExpenseSummary() {
+    Map<String, double> dailyExpenseSummary = {};
 
-  Map<String,double> calculateDailyExpenseSummary()
-  {
-    Map<String,double> dailyExpenseSummary =
-        {
-
-        };
-
-    for (var expense in overallExpenses)
-    {
+    for (var expense in overallExpenses) {
       String date = convertDateTimeToString(expense.dateTime);
       double amount = double.parse(expense.amount);
 
-      if(dailyExpenseSummary.containsKey(date))
-        {
-          double currentAmount = dailyExpenseSummary[date]!;
-          currentAmount += amount;
-          dailyExpenseSummary[date] = currentAmount;
-        }
-      else
-        {
-          dailyExpenseSummary.addAll({date: amount});
-        }
+      if (dailyExpenseSummary.containsKey(date)) {
+        double currentAmount = dailyExpenseSummary[date]!;
+        currentAmount += amount;
+        dailyExpenseSummary[date] = currentAmount;
+      } else {
+        dailyExpenseSummary.addAll({date: amount});
+      }
     }
     return dailyExpenseSummary;
   }

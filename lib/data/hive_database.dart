@@ -1,13 +1,12 @@
+import 'package:budget_app/models/budget_item.dart';
 import 'package:budget_app/models/expense_item.dart';
-import 'package:hive_flutter/adapters.dart';
+import 'package:hive/hive.dart';
 
 class HiveDataBase {
-  final _myBox = Hive.box("expense_database");
+  final _myBox = Hive.box("expense_database2");
 
-  //write data
+  // Write data
   void saveData(List<ExpenseItem> allExpenses) {
-    // convert expense item objects into items that can be stored in the database
-
     List<List<dynamic>> allExpensesFormatted = [];
 
     for (var expense in allExpenses) {
@@ -20,18 +19,18 @@ class HiveDataBase {
       allExpensesFormatted.add(expenseFormatted);
     }
 
-    //store list in the database
     _myBox.put("ALL_EXPENSES", allExpensesFormatted);
   }
 
-  // read data
+  void saveBudget(String budget) {
+    _myBox.put("BUDGET", budget);
+  }
 
+
+  // Read data
   List<ExpenseItem> readData() {
-
-    // convert database item objects into expense items
-
     List savedExpenses = _myBox.get("ALL_EXPENSES") ?? [];
-    List <ExpenseItem> allExpenses = [];
+    List<ExpenseItem> allExpenses = [];
 
     for(int i = 0; i < savedExpenses.length; i++)
       {
@@ -50,4 +49,10 @@ class HiveDataBase {
 
     return allExpenses;
   }
+
+  String readBudgetData() {
+    
+    return _myBox.get("BUDGET", defaultValue: '0.00');
+  }
+
 }

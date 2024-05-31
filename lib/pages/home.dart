@@ -1,12 +1,14 @@
 import 'package:budget_app/components/expense_summary.dart';
-import 'package:budget_app/components/expense_tile.dart';
 import 'package:budget_app/data/expense_data.dart';
 import 'package:budget_app/models/expense_item.dart';
+import 'package:budget_app/pages/budgeting.dart';
+import 'package:budget_app/pages/expenses.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _MyHomePageState();
@@ -16,13 +18,17 @@ class _MyHomePageState extends State<HomePage> {
   final newExpenseNameController = TextEditingController();
   final newExpensePoundController = TextEditingController();
   final newExpensePenceController = TextEditingController();
+  final GlobalKey<ExpenseSummaryState> expenseSummaryKey =
+      GlobalKey<ExpenseSummaryState>();
   int selectedIndex = 0;
 
   @override
   void initState() {
     super.initState();
-
-    Provider.of<ExpenseData>(context, listen: false).prepareData();
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      Provider.of<ExpenseData>(context, listen: false).prepareData();
+      setState(() {});
+    });
   }
 
   // Add new expense method
@@ -30,7 +36,7 @@ class _MyHomePageState extends State<HomePage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Add New Expense'),
+        title: const Text('Add New Expense'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -73,21 +79,16 @@ class _MyHomePageState extends State<HomePage> {
           // Save button
           MaterialButton(
             onPressed: save,
-            child: Text('Save'),
+            child: const Text('Save'),
           ),
           // Cancel button
           MaterialButton(
             onPressed: cancel,
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
           ),
         ],
       ),
     );
-  }
-
-  // Delete expense method
-  void deleteExpense(ExpenseItem expenseItem) {
-    Provider.of<ExpenseData>(context, listen: false).deleteExpense(expenseItem);
   }
 
   // Save method
@@ -130,47 +131,79 @@ class _MyHomePageState extends State<HomePage> {
     });
   }
 
+  // Check if the current page is either home or expenses page
+  bool isExpenseOrHomePage() {
+    return selectedIndex == 0 || selectedIndex == 2;
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> pages = [
       Consumer<ExpenseData>(
-        builder: (context, value, child) => ListView(
-          children: [
-            // Weekly summary
-            ExpenseSummary(startOfWeek: value.startOfWeekDate()),
-            const SizedBox(height: 10),
-            // Expense list
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: value.getOverallExpenses().length,
-              itemBuilder: (context, index) => ExpenseTile(
-                name: value.getOverallExpenses()[index].name,
-                amount: value.getOverallExpenses()[index].amount,
-                dateTime: value.getOverallExpenses()[index].dateTime,
-                deleteTapped: (p0) =>
-                    deleteExpense(value.getOverallExpenses()[index]),
+        builder: (context, value, child) {
+          final weekTotal =
+              expenseSummaryKey.currentState?.getWeekTotal() ?? '0.00';
+          return ListView(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(25.0),
+                child: Row(
+                  children: [
+                    const Text(
+                      'Total Week Expenses: ',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                    ),
+                    Text('£$weekTotal', style: const TextStyle(fontSize: 20)),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
+              const Padding(
+                padding: EdgeInsets.all(25.0),
+                child: Row(
+                  children: [
+                    Text(
+                      'Total Income: ',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                    ),
+                    Text('£100', style: TextStyle(fontSize: 20)),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
       ),
-      Placeholder(), // This can be your Budgeting page
+      const BudgetingPage(),
+      const ExpensesPage(),
     ];
 
     List<String> pageTitles = [
       'Home',
       'Budgeting',
+      'Expenses',
     ];
 
     return Scaffold(
       backgroundColor: Colors.white,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.blue,
-        onPressed: addNewExpense,
-        child: Icon(Icons.add),
+      body: Stack(
+        children: [
+          pages[selectedIndex],
+          Positioned(
+            top: 0.0,
+            right: 16.0,
+            child: Visibility(
+              visible: isExpenseOrHomePage(),
+              child: FloatingActionButton(
+                backgroundColor: Colors.blue,
+                onPressed: addNewExpense,
+                child: Icon(Icons.add),
+              ),
+            ),
+          ),
+        ],
       ),
-      body: pages[selectedIndex],
       appBar: AppBar(
         title: Text(pageTitles[selectedIndex]),
       ),
@@ -182,6 +215,8 @@ class _MyHomePageState extends State<HomePage> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.money), label: 'Budgeting'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.currency_pound), label: 'Expenses'),
         ],
       ),
     );

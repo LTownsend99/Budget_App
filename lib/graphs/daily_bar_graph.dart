@@ -40,7 +40,7 @@ class DailyBarGraph extends StatelessWidget {
       maxY: 200,
       minY: 0,
       backgroundColor: Colors.white,
-      titlesData: FlTitlesData(
+      titlesData: const FlTitlesData(
         show: true,
         topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
         rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -50,7 +50,7 @@ class DailyBarGraph extends StatelessWidget {
                 showTitles: true,
             getTitlesWidget: getBottomTitles))
       ),
-      gridData: FlGridData(show: false),
+      gridData: const FlGridData(show: false),
       borderData: FlBorderData(show: true),
       barGroups: barData.barData
           .map(
