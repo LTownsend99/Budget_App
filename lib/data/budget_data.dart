@@ -1,5 +1,4 @@
 import 'package:budget_app/data/hive_database.dart';
-import 'package:budget_app/models/budget_item.dart';
 import 'package:flutter/cupertino.dart';
 
 class BudgetData extends ChangeNotifier {
@@ -16,6 +15,8 @@ class BudgetData extends ChangeNotifier {
   //prepare data to display
   final db = HiveDataBase();
 
+
+
   void prepareData() {
     budget = db.readBudgetData();
     notifyListeners();
@@ -29,4 +30,6 @@ class BudgetData extends ChangeNotifier {
     budget = newBudget;
     notifyListeners();
   }
+
+
 }

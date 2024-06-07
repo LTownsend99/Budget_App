@@ -80,8 +80,7 @@ class ExpenseSummaryState extends State<ExpenseSummary> {
     return weekTotal;
   }
 
-  double getTotalExpenses()
-  {
+  double getTotalExpenses() {
     return totalExpenses;
   }
 
@@ -117,10 +116,11 @@ class ExpenseSummaryState extends State<ExpenseSummary> {
               child: Row(
                 children: [
                   const Text(
-                    'Week Total: ',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    'Total Week Expenses: ',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+
                   ),
-                  Text('\£$weekTotal'),
+                  Text('\£$weekTotal', style: const TextStyle(fontSize: 20)),
                 ],
               ),
             ),

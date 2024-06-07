@@ -38,6 +38,7 @@ class _MyExpensePageState extends State<ExpensesPage>
             itemCount: value.getOverallExpenses().length,
             itemBuilder: (context, index) => ExpenseTile(
               name: value.getOverallExpenses()[index].name,
+              category: value.getOverallExpenses()[index].category,
               amount: value.getOverallExpenses()[index].amount,
               dateTime: value.getOverallExpenses()[index].dateTime,
               deleteTapped: (p0) =>

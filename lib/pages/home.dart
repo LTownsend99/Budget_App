@@ -1,9 +1,9 @@
 import 'package:budget_app/components/expense_summary.dart';
 import 'package:budget_app/data/expense_data.dart';
+import 'package:budget_app/data/budget_data.dart'; // Import BudgetData
 import 'package:budget_app/models/expense_item.dart';
 import 'package:budget_app/pages/budgeting.dart';
 import 'package:budget_app/pages/expenses.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -19,79 +19,95 @@ class _MyHomePageState extends State<HomePage> {
   final newExpensePoundController = TextEditingController();
   final newExpensePenceController = TextEditingController();
   final GlobalKey<ExpenseSummaryState> expenseSummaryKey =
-      GlobalKey<ExpenseSummaryState>();
+  GlobalKey<ExpenseSummaryState>();
   int selectedIndex = 0;
+  final List<String> categories = [
+    'Food & Drink',
+    'Transport',
+    'Leisure',
+    'Utilities',
+    'Savings',
+    'Other'
+  ];
+  String selectedCategory = 'Food & Drink';
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<ExpenseData>(context, listen: false).prepareData();
-      setState(() {});
+      Provider.of<BudgetData>(context, listen: false)
+          .prepareData(); // Prepare budget data
     });
   }
 
-  // Add new expense method
   void addNewExpense() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add New Expense'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Expense name
-            TextField(
-              controller: newExpenseNameController,
-              decoration: const InputDecoration(
-                hintText: "Expense Name",
-              ),
-            ),
-            // Expense amount
-            Row(
+      builder: (context) =>
+          AlertDialog(
+            title: const Text('Add New Expense'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                // Pounds
-                Expanded(
-                  child: TextField(
-                    controller: newExpensePoundController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      hintText: "Pounds",
-                    ),
+                TextField(
+                  controller: newExpenseNameController,
+                  decoration: const InputDecoration(
+                    hintText: "Expense Name",
                   ),
                 ),
-                // Pence
-                Expanded(
-                  child: TextField(
-                    controller: newExpensePenceController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      hintText: "Pence",
+                DropdownButtonFormField(
+                  items: categories.map((String category) {
+                    return DropdownMenuItem<String>(
+                      value: category,
+                      child: Text(category),
+                    );
+                  }).toList(),
+                  onChanged: (newValue) {
+                    setState(() {
+                      selectedCategory = newValue!;
+                    });
+                  },
+                  decoration: const InputDecoration(labelText: 'Category'),
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: newExpensePoundController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          hintText: "Pounds",
+                        ),
+                      ),
                     ),
-                  ),
+                    Expanded(
+                      child: TextField(
+                        controller: newExpensePenceController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          hintText: "Pence",
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-            // Expense date
-          ],
-        ),
-        actions: [
-          // Save button
-          MaterialButton(
-            onPressed: save,
-            child: const Text('Save'),
+            actions: [
+              MaterialButton(
+                onPressed: save,
+                child: const Text('Save'),
+              ),
+              MaterialButton(
+                onPressed: cancel,
+                child: const Text('Cancel'),
+              ),
+            ],
           ),
-          // Cancel button
-          MaterialButton(
-            onPressed: cancel,
-            child: const Text('Cancel'),
-          ),
-        ],
-      ),
     );
   }
 
-  // Save method
   void save() {
     if (newExpenseNameController.text.isNotEmpty &&
         newExpensePoundController.text.isNotEmpty &&
@@ -102,36 +118,35 @@ class _MyHomePageState extends State<HomePage> {
         name: newExpenseNameController.text,
         amount: amount,
         dateTime: DateTime.now(),
+        category: selectedCategory,
       );
       Provider.of<ExpenseData>(context, listen: false)
           .addNewExpense(newExpenseItem);
     }
 
+    setState(() {}); // Ensure the widget rebuilds after adding a new expense
     Navigator.pop(context);
     clear();
   }
 
-  // Cancel method
   void cancel() {
     Navigator.pop(context);
     clear();
   }
 
-  // Clear method
   void clear() {
     newExpensePoundController.clear();
     newExpensePenceController.clear();
     newExpenseNameController.clear();
+    selectedCategory = categories.first;
   }
 
-  // Method to handle item tap in bottom navigation bar
   void onItemTapped(int index) {
     setState(() {
       selectedIndex = index;
     });
   }
 
-  // Check if the current page is either home or expenses page
   bool isExpenseOrHomePage() {
     return selectedIndex == 0 || selectedIndex == 2;
   }
@@ -139,10 +154,9 @@ class _MyHomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     List<Widget> pages = [
-      Consumer<ExpenseData>(
-        builder: (context, value, child) {
-          final weekTotal =
-              expenseSummaryKey.currentState?.getWeekTotal() ?? '0.00';
+      Consumer2<ExpenseData, BudgetData>(
+        builder: (context, expenseData, budgetData, child) {
+          final budget = budgetData.getBudgetAmount();
           return ListView(
             children: [
               Padding(
@@ -150,26 +164,18 @@ class _MyHomePageState extends State<HomePage> {
                 child: Row(
                   children: [
                     const Text(
-                      'Total Week Expenses: ',
+                      'Total Budget: ',
                       style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                      TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                     ),
-                    Text('£$weekTotal', style: const TextStyle(fontSize: 20)),
+                    Text('£$budget', style: const TextStyle(fontSize: 20)),
                   ],
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.all(25.0),
-                child: Row(
-                  children: [
-                    Text(
-                      'Total Income: ',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                    ),
-                    Text('£100', style: TextStyle(fontSize: 20)),
-                  ],
-                ),
+              ExpenseSummary(
+                key: expenseSummaryKey,
+                startOfWeek:
+                Provider.of<ExpenseData>(context).startOfWeekDate(),
               ),
             ],
           );
@@ -198,7 +204,7 @@ class _MyHomePageState extends State<HomePage> {
               child: FloatingActionButton(
                 backgroundColor: Colors.blue,
                 onPressed: addNewExpense,
-                child: Icon(Icons.add),
+                child: const Icon(Icons.add),
               ),
             ),
           ),
