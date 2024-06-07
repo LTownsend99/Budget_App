@@ -4,6 +4,7 @@ import 'package:budget_app/data/expense_data.dart';
 import 'package:budget_app/data/budget_data.dart'; // Import BudgetData
 import 'package:budget_app/datetime/date_time_helper.dart';
 import 'package:budget_app/models/expense_item.dart';
+import 'package:budget_app/pages/Scanner.dart';
 import 'package:budget_app/pages/budgeting.dart';
 import 'package:budget_app/pages/expenses.dart';
 import 'package:flutter/material.dart';
@@ -231,7 +232,7 @@ class _MyHomePageState extends State<HomePage> {
       ),
       const BudgetingPage(),
       const ExpensesPage(),
-      const Placeholder(),
+      const ScannerPage(),
     ];
 
     List<String> pageTitles = [
