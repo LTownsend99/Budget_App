@@ -95,4 +95,22 @@ class ExpenseData extends ChangeNotifier {
     }
     return dailyExpenseSummary;
   }
+
+  // Calculate category totals
+  Map<String, double> calculateCategoryTotals() {
+    Map<String, double> categoryTotals = {};
+
+    for (var expense in overallExpenses) {
+      String category = expense.category;
+      double amount = double.parse(expense.amount);
+
+      if (categoryTotals.containsKey(category)) {
+        categoryTotals[category] = categoryTotals[category]! + amount;
+      } else {
+        categoryTotals[category] = amount;
+      }
+    }
+
+    return categoryTotals;
+  }
 }

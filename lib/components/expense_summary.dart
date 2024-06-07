@@ -26,7 +26,7 @@ class ExpenseSummaryState extends State<ExpenseSummary> {
       String friday,
       String saturday,
       String sunday) {
-    double? max = 100;
+    double? max = 200;
 
     List<double> values = [
       value.calculateDailyExpenseSummary()[monday] ?? 0,
@@ -44,7 +44,7 @@ class ExpenseSummaryState extends State<ExpenseSummary> {
     // Increase slightly so the bar is never full
     max = values.last * 1.1;
 
-    return max == 0 ? 100 : max;
+    return max == 0 ? 200 : max;
   }
 
   String calculateWeekTotal(

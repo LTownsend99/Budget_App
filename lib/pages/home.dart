@@ -1,6 +1,8 @@
+import 'package:budget_app/components/category_colour_manager.dart';
 import 'package:budget_app/components/expense_summary.dart';
 import 'package:budget_app/data/expense_data.dart';
 import 'package:budget_app/data/budget_data.dart'; // Import BudgetData
+import 'package:budget_app/datetime/date_time_helper.dart';
 import 'package:budget_app/models/expense_item.dart';
 import 'package:budget_app/pages/budgeting.dart';
 import 'package:budget_app/pages/expenses.dart';
@@ -18,8 +20,9 @@ class _MyHomePageState extends State<HomePage> {
   final newExpenseNameController = TextEditingController();
   final newExpensePoundController = TextEditingController();
   final newExpensePenceController = TextEditingController();
+  final newExpenseDateController = TextEditingController();
   final GlobalKey<ExpenseSummaryState> expenseSummaryKey =
-  GlobalKey<ExpenseSummaryState>();
+      GlobalKey<ExpenseSummaryState>();
   int selectedIndex = 0;
   final List<String> categories = [
     'Food & Drink',
@@ -30,6 +33,8 @@ class _MyHomePageState extends State<HomePage> {
     'Other'
   ];
   String selectedCategory = 'Food & Drink';
+  DateTime selectedDate = DateTime.now(); // Initialize with current date
+
 
   @override
   void initState() {
@@ -44,67 +49,89 @@ class _MyHomePageState extends State<HomePage> {
   void addNewExpense() {
     showDialog(
       context: context,
-      builder: (context) =>
-          AlertDialog(
-            title: const Text('Add New Expense'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
+      builder: (context) => AlertDialog(
+        title: const Text('Add New Expense'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: newExpenseNameController,
+              decoration: const InputDecoration(
+                hintText: "Expense Name",
+              ),
+            ),
+            DropdownButtonFormField(
+              items: categories.map((String category) {
+                return DropdownMenuItem<String>(
+                  value: category,
+                  child: Text(category),
+                );
+              }).toList(),
+              onChanged: (newValue) {
+                setState(() {
+                  selectedCategory = newValue!;
+                });
+              },
+              decoration: const InputDecoration(labelText: 'Category'),
+            ),
+            Row(
               children: [
-                TextField(
-                  controller: newExpenseNameController,
-                  decoration: const InputDecoration(
-                    hintText: "Expense Name",
+                Expanded(
+                  child: TextField(
+                    controller: newExpensePoundController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      hintText: "Pounds",
+                    ),
                   ),
                 ),
-                DropdownButtonFormField(
-                  items: categories.map((String category) {
-                    return DropdownMenuItem<String>(
-                      value: category,
-                      child: Text(category),
-                    );
-                  }).toList(),
-                  onChanged: (newValue) {
-                    setState(() {
-                      selectedCategory = newValue!;
-                    });
-                  },
-                  decoration: const InputDecoration(labelText: 'Category'),
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: newExpensePoundController,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          hintText: "Pounds",
-                        ),
-                      ),
+                Expanded(
+                  child: TextField(
+                    controller: newExpensePenceController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      hintText: "Pence",
                     ),
-                    Expanded(
-                      child: TextField(
-                        controller: newExpensePenceController,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          hintText: "Pence",
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ],
             ),
-            actions: [
-              MaterialButton(
-                onPressed: save,
-                child: const Text('Save'),
+            // Date selection
+            TextFormField(
+              onTap: () async {
+                final DateTime? pickedDate = await showDatePicker(
+                  context: context,
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2100),
+                  initialDate: selectedDate,
+                );
+                if (pickedDate != null && pickedDate != selectedDate) {
+                  setState(() {
+                    selectedDate = pickedDate;
+                  });
+                  newExpenseDateController.text = convertDateTimeToString(selectedDate);
+                }
+              },
+              readOnly: true,
+              controller: newExpenseDateController,
+              decoration: const InputDecoration(
+                labelText: 'Date',
+                hintText: 'Select a date',
               ),
-              MaterialButton(
-                onPressed: cancel,
-                child: const Text('Cancel'),
-              ),
-            ],
+            ),
+          ],
+        ),
+        actions: [
+          MaterialButton(
+            onPressed: save,
+            child: const Text('Save'),
           ),
+          MaterialButton(
+            onPressed: cancel,
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -117,7 +144,7 @@ class _MyHomePageState extends State<HomePage> {
       ExpenseItem newExpenseItem = ExpenseItem(
         name: newExpenseNameController.text,
         amount: amount,
-        dateTime: DateTime.now(),
+        dateTime: selectedDate,
         category: selectedCategory,
       );
       Provider.of<ExpenseData>(context, listen: false)
@@ -157,6 +184,8 @@ class _MyHomePageState extends State<HomePage> {
       Consumer2<ExpenseData, BudgetData>(
         builder: (context, expenseData, budgetData, child) {
           final budget = budgetData.getBudgetAmount();
+          Map<String, double> categoryTotals = expenseData
+              .calculateCategoryTotals(); // Calculate category totals
           return ListView(
             children: [
               Padding(
@@ -164,9 +193,9 @@ class _MyHomePageState extends State<HomePage> {
                 child: Row(
                   children: [
                     const Text(
-                      'Total Budget: ',
+                      'Total Monthly Budget: ',
                       style:
-                      TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                     ),
                     Text('£$budget', style: const TextStyle(fontSize: 20)),
                   ],
@@ -175,7 +204,26 @@ class _MyHomePageState extends State<HomePage> {
               ExpenseSummary(
                 key: expenseSummaryKey,
                 startOfWeek:
-                Provider.of<ExpenseData>(context).startOfWeekDate(),
+                    Provider.of<ExpenseData>(context).startOfWeekDate(),
+              ),
+              const SizedBox(height: 15,),
+              Column(
+                children: () {
+                  categories.sort((a, b) => (categoryTotals[b] ?? 0)
+                      .compareTo(categoryTotals[a] ?? 0));
+                  return categories.map((category) {
+                    return ListTile(
+                      tileColor: CategoryColorManager.getCategoryColor(category),
+                      leading: Text(
+                        category,
+                        style: const TextStyle(color: Colors.black, fontSize: 11),
+                      ),
+                      trailing: Text(
+                        '£${categoryTotals[category]?.toStringAsFixed(2) ?? "0.00"}',
+                      ),
+                    );
+                  }).toList();
+                }(),
               ),
             ],
           );
@@ -183,12 +231,14 @@ class _MyHomePageState extends State<HomePage> {
       ),
       const BudgetingPage(),
       const ExpensesPage(),
+      const Placeholder(),
     ];
 
     List<String> pageTitles = [
       'Home',
       'Budgeting',
       'Expenses',
+      'Scan'
     ];
 
     return Scaffold(
@@ -198,7 +248,7 @@ class _MyHomePageState extends State<HomePage> {
           pages[selectedIndex],
           Positioned(
             top: 0.0,
-            right: 16.0,
+            right: 5.0,
             child: Visibility(
               visible: isExpenseOrHomePage(),
               child: FloatingActionButton(
@@ -223,6 +273,7 @@ class _MyHomePageState extends State<HomePage> {
           BottomNavigationBarItem(icon: Icon(Icons.money), label: 'Budgeting'),
           BottomNavigationBarItem(
               icon: Icon(Icons.currency_pound), label: 'Expenses'),
+          BottomNavigationBarItem(icon: Icon(Icons.photo_camera), label: 'Scan'),
         ],
       ),
     );

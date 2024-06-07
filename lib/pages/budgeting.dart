@@ -131,7 +131,7 @@ class _MyBudgetPageState extends State<BudgetingPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      'Remaining Budget: ',
+                      'Remaining Monthly Budget: ',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 20),
                     ),
