@@ -1,5 +1,9 @@
+import 'dart:developer';
+
 import 'package:budget_app/Utils/image_picker_class.dart';
 import 'package:budget_app/models/image_picker.dart';
+import 'package:budget_app/pages/image_cropper_page.dart';
+import 'package:budget_app/pages/recognise_image_page.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -23,11 +27,29 @@ class _MyScannerPageState extends State<ScannerPage> {
         onPressed: () {
           imagePicker(context, onCameraTap: () {
             pickImage(ImageSource.camera).then((value) {
-              if (value != '') {}
+              if (value != '') {
+                imageCropperView(value, context).then((value) {
+                  if (value != '') {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => RecogniseImagePage(path: value)));
+                  }
+                });
+              }
             });
           }, onGalleryTap: () {
             pickImage(ImageSource.gallery).then((value) {
-              if(value != '') {}
+              if (value != '') {
+                imageCropperView(value, context).then((value) {
+                  if (value != '') {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => RecogniseImagePage(path: value)));
+                  }
+                });
+              }
             });
           });
         },
