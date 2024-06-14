@@ -6,6 +6,7 @@ import 'package:budget_app/models/expense_item.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:provider/provider.dart';
+import 'package:budget_app/Utils/categories.dart';
 
 class RecogniseImagePage extends StatefulWidget {
   final String? path;
@@ -25,14 +26,6 @@ class _RecogniseImagePageState extends State<RecogniseImagePage> {
   final newExpensePenceController = TextEditingController();
   final newExpenseDateController = TextEditingController();
   int selectedIndex = 0;
-  final List<String> categories = [
-    'Food & Drink',
-    'Transport',
-    'Leisure',
-    'Utilities',
-    'Savings',
-    'Other'
-  ];
   String selectedCategory = 'Food & Drink';
   DateTime selectedDate = DateTime.now(); // Initialize with current date
 

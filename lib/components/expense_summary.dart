@@ -114,6 +114,7 @@ class ExpenseSummaryState extends State<ExpenseSummary> {
             Padding(
               padding: const EdgeInsets.all(25.0),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
                     'Total Week Expenses: ',

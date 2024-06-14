@@ -1,12 +1,12 @@
-import 'package:budget_app/components/category_colour_manager.dart';
 import 'package:budget_app/components/expense_summary.dart';
 import 'package:budget_app/data/expense_data.dart';
 import 'package:budget_app/data/budget_data.dart'; // Import BudgetData
 import 'package:budget_app/datetime/date_time_helper.dart';
 import 'package:budget_app/models/expense_item.dart';
-import 'package:budget_app/pages/Scanner.dart';
+import 'package:budget_app/pages/scanner.dart';
 import 'package:budget_app/pages/budgeting.dart';
 import 'package:budget_app/pages/expenses.dart';
+import 'package:budget_app/Utils/categories.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -25,17 +25,8 @@ class _MyHomePageState extends State<HomePage> {
   final GlobalKey<ExpenseSummaryState> expenseSummaryKey =
       GlobalKey<ExpenseSummaryState>();
   int selectedIndex = 0;
-  final List<String> categories = [
-    'Food & Drink',
-    'Transport',
-    'Leisure',
-    'Utilities',
-    'Savings',
-    'Other'
-  ];
   String selectedCategory = 'Food & Drink';
   DateTime selectedDate = DateTime.now(); // Initialize with current date
-
 
   @override
   void initState() {
@@ -110,7 +101,8 @@ class _MyHomePageState extends State<HomePage> {
                   setState(() {
                     selectedDate = pickedDate;
                   });
-                  newExpenseDateController.text = convertDateTimeToString(selectedDate);
+                  newExpenseDateController.text =
+                      convertDateTimeToString(selectedDate);
                 }
               },
               readOnly: true,
@@ -190,16 +182,23 @@ class _MyHomePageState extends State<HomePage> {
           return ListView(
             children: [
               Padding(
-                padding: const EdgeInsets.all(25.0),
-                child: Row(
-                  children: [
-                    const Text(
-                      'Total Monthly Budget: ',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                    ),
-                    Text('£$budget', style: const TextStyle(fontSize: 20)),
-                  ],
+                padding: const EdgeInsets.all(20.0),
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Total Monthly Budget: ',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            color: Colors.black),
+                      ),
+                      Text('£$budget',
+                          style: const TextStyle(
+                              fontSize: 20, color: Colors.black)),
+                    ],
+                  ),
                 ),
               ),
               ExpenseSummary(
@@ -207,24 +206,8 @@ class _MyHomePageState extends State<HomePage> {
                 startOfWeek:
                     Provider.of<ExpenseData>(context).startOfWeekDate(),
               ),
-              const SizedBox(height: 15,),
-              Column(
-                children: () {
-                  categories.sort((a, b) => (categoryTotals[b] ?? 0)
-                      .compareTo(categoryTotals[a] ?? 0));
-                  return categories.map((category) {
-                    return ListTile(
-                      tileColor: CategoryColorManager.getCategoryColor(category),
-                      leading: Text(
-                        category,
-                        style: const TextStyle(color: Colors.black, fontSize: 11),
-                      ),
-                      trailing: Text(
-                        '£${categoryTotals[category]?.toStringAsFixed(2) ?? "0.00"}',
-                      ),
-                    );
-                  }).toList();
-                }(),
+              const SizedBox(
+                height: 15,
               ),
             ],
           );
@@ -235,12 +218,7 @@ class _MyHomePageState extends State<HomePage> {
       const ScannerPage(),
     ];
 
-    List<String> pageTitles = [
-      'Home',
-      'Budgeting',
-      'Expenses',
-      'Scanner'
-    ];
+    List<String> pageTitles = ['Home', 'Budgeting', 'Expenses', 'Scanner'];
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -248,7 +226,7 @@ class _MyHomePageState extends State<HomePage> {
         children: [
           pages[selectedIndex],
           Positioned(
-            top: 0.0,
+            top: 45.0,
             right: 5.0,
             child: Visibility(
               visible: isExpenseOrHomePage(),
@@ -274,7 +252,8 @@ class _MyHomePageState extends State<HomePage> {
           BottomNavigationBarItem(icon: Icon(Icons.money), label: 'Budgeting'),
           BottomNavigationBarItem(
               icon: Icon(Icons.currency_pound), label: 'Expenses'),
-          BottomNavigationBarItem(icon: Icon(Icons.photo_camera), label: 'Scan'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.photo_camera), label: 'Scan'),
         ],
       ),
     );

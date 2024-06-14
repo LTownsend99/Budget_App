@@ -1,4 +1,6 @@
+import 'package:budget_app/Utils/categories.dart';
 import 'package:budget_app/components/budget_summary.dart';
+import 'package:budget_app/components/category_colour_manager.dart';
 import 'package:budget_app/data/budget_data.dart';
 import 'package:budget_app/data/expense_data.dart';
 import 'package:flutter/material.dart';
@@ -112,16 +114,21 @@ class _MyBudgetPageState extends State<BudgetingPage> {
       backgroundColor: Colors.grey[200],
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.blue,
-        onPressed: addBudget,
+        onPressed: () => addBudget(),
         child: const Icon(Icons.add),
       ),
       body: Consumer2<BudgetData, ExpenseData>(
         builder: (context, budgetData, expenseData, child) {
-          String totalExpenses =
-          expenseData.getTotalExpenses().toStringAsFixed(2);
+          String totalExpenses = expenseData.getTotalExpenses().toStringAsFixed(2);
           String budget = budgetData.getBudgetAmount();
-          String remaining = remainingBudget(
-              budget, totalExpenses); // Calculate remaining budget
+          String remaining = remainingBudget(budget, totalExpenses);
+
+          Map<String, double> categoryTotals = expenseData.calculateCategoryTotals();
+
+          // Create a mutable copy of categories list
+          List<String> mutableCategories = categories.toList();
+          // Sort the mutable copy based on category totals
+          mutableCategories.sort((a, b) => (categoryTotals[b] ?? 0).compareTo(categoryTotals[a] ?? 0));
 
           return ListView(
             children: [
@@ -132,8 +139,7 @@ class _MyBudgetPageState extends State<BudgetingPage> {
                   children: [
                     const Text(
                       'Remaining Monthly Budget: ',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 20),
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                     ),
                     Text(
                       '£$remaining',
@@ -142,7 +148,6 @@ class _MyBudgetPageState extends State<BudgetingPage> {
                   ],
                 ),
               ),
-              // Total expenses
               Padding(
                 padding: const EdgeInsets.all(25.0),
                 child: Row(
@@ -150,8 +155,7 @@ class _MyBudgetPageState extends State<BudgetingPage> {
                   children: [
                     const Text(
                       'Total Expenses: ',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 20),
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                     ),
                     Text(
                       '£$totalExpenses',
@@ -161,8 +165,24 @@ class _MyBudgetPageState extends State<BudgetingPage> {
                 ),
               ),
               BudgetSummary(
-                budget: double.parse(budgetData.getBudgetAmount()),
+                budget: double.parse(budget),
                 totalExpenses: double.parse(totalExpenses),
+              ),
+              const SizedBox(height: 15),
+              Column(
+                children: mutableCategories.map((category) {
+                  return ListTile(
+                    tileColor: CategoryColorManager.getCategoryColor(category),
+                    leading: Text(
+                      category,
+                      style: const TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),
+                    ),
+                    trailing: Text(
+                      '£${categoryTotals[category]?.toStringAsFixed(2) ?? "0.00"}',
+                      style: const TextStyle(color: Colors.black, fontSize: 13),
+                    ),
+                  );
+                }).toList(),
               ),
             ],
           );

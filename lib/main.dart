@@ -1,6 +1,7 @@
 import 'package:budget_app/data/budget_data.dart'; // Import your BudgetData class
 import 'package:budget_app/data/expense_data.dart';
 import 'package:budget_app/pages/home.dart';
+import 'package:budget_app/pages/passcode.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
       ],
       builder: (context, child) => const MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: HomePage(),
+        home: PasscodePage(),
       ),
     );
   }

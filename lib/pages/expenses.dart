@@ -27,7 +27,7 @@ class _MyExpensePageState extends State<ExpensesPage> {
         return ListView(
           children: [
             Padding(
-              padding: const EdgeInsets.all(25.0),
+              padding: const EdgeInsets.all(15.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

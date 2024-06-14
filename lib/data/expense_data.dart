@@ -96,6 +96,25 @@ class ExpenseData extends ChangeNotifier {
     return dailyExpenseSummary;
   }
 
+  // Convert overall list into monthly summaries
+  Map<String, double> calculateMonthlyExpenseSummary() {
+    Map<String, double> monthlyExpenseSummary = {};
+
+    for (var expense in overallExpenses) {
+      String date = convertDateTimeToString(expense.dateTime);
+      double amount = double.parse(expense.amount);
+
+      if (monthlyExpenseSummary.containsKey(date)) {
+        double currentAmount = monthlyExpenseSummary[date]!;
+        currentAmount += amount;
+        monthlyExpenseSummary[date] = currentAmount;
+      } else {
+        monthlyExpenseSummary.addAll({date: amount});
+      }
+    }
+    return monthlyExpenseSummary;
+  }
+
   // Calculate category totals
   Map<String, double> calculateCategoryTotals() {
     Map<String, double> categoryTotals = {};
