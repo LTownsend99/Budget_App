@@ -239,7 +239,7 @@ class _MyHomePageState extends State<HomePage> {
       'Home',
       'Budgeting',
       'Expenses',
-      'Scan'
+      'Scanner'
     ];
 
     return Scaffold(

@@ -20,40 +20,51 @@ class _MyScannerPageState extends State<ScannerPage> {
     return Scaffold(
       backgroundColor: Colors.white, // Set the background color to white
 
-      body: const Center(
-        child: Text('Scanner Page Content'),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          imagePicker(context, onCameraTap: () {
-            pickImage(ImageSource.camera).then((value) {
-              if (value != '') {
-                imageCropperView(value, context).then((value) {
-                  if (value != '') {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => RecogniseImagePage(path: value)));
-                  }
-                });
-              }
-            });
-          }, onGalleryTap: () {
-            pickImage(ImageSource.gallery).then((value) {
-              if (value != '') {
-                imageCropperView(value, context).then((value) {
-                  if (value != '') {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => RecogniseImagePage(path: value)));
-                  }
-                });
-              }
-            });
-          });
-        },
-        child: const Icon(Icons.photo_camera),
+      body: Stack(
+        children: [
+          Positioned(
+            bottom: MediaQuery.of(context).size.height / 2 - 58, // Center vertically
+            left: MediaQuery.of(context).size.width / 2 - 145, // Center horizontally
+            child: Container(
+              width: 300,
+              height: 50,
+              child: FloatingActionButton(
+                onPressed: () {
+                  imagePicker(context, onCameraTap: () {
+                    pickImage(ImageSource.camera).then((value) {
+                      if (value != '') {
+                        imageCropperView(value, context).then((value) {
+                          if (value != '') {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) =>
+                                        RecogniseImagePage(path: value)));
+                          }
+                        });
+                      }
+                    });
+                  }, onGalleryTap: () {
+                    pickImage(ImageSource.gallery).then((value) {
+                      if (value != '') {
+                        imageCropperView(value, context).then((value) {
+                          if (value != '') {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) =>
+                                        RecogniseImagePage(path: value)));
+                          }
+                        });
+                      }
+                    });
+                  });
+                },
+                child: const Icon(Icons.photo_camera),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
