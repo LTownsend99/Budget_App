@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 
 class CategoryColorManager {
   static final Map<String, Color> _categoryColors = {
-    'Food & Drink': Colors.lightGreen,
-    'Transport': Colors.lightBlueAccent,
-    'Leisure': Colors.orange,
-    'Utilities': Colors.grey,
-    'Savings': Colors.purpleAccent,
-    'Other': Colors.yellow,
+    'Food & Drink': Colors.lightGreen.shade100,
+    'Transport': Colors.lightBlue.shade100,
+    'Leisure': Colors.orange.shade100,
+    'Utilities': Colors.red.shade100,
+    'Savings': Colors.purple.shade100,
+    'Other': Colors.yellow.shade100,
     // Add more categories and corresponding colors as needed
   };
 
