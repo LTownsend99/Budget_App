@@ -45,7 +45,7 @@ class _MyExpensePageState extends State<ExpensesPage> {
             ),
             // Weekly summary
             ExpenseSummary(startOfWeek: value.startOfWeekDate()),
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
             // Expense list
             SingleChildScrollView(
               child: Column(

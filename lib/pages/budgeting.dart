@@ -112,11 +112,6 @@ class _MyBudgetPageState extends State<BudgetingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[200],
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.blue,
-        onPressed: () => addBudget(),
-        child: const Icon(Icons.add),
-      ),
       body: Consumer2<BudgetData, ExpenseData>(
         builder: (context, budgetData, expenseData, child) {
           String totalExpenses = expenseData.getTotalExpenses().toStringAsFixed(2);
@@ -130,59 +125,73 @@ class _MyBudgetPageState extends State<BudgetingPage> {
           // Sort the mutable copy based on category totals
           mutableCategories.sort((a, b) => (categoryTotals[b] ?? 0).compareTo(categoryTotals[a] ?? 0));
 
-          return ListView(
+          return Stack(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(25.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Remaining Monthly Budget: ',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              ListView(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(25.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          'Remaining Monthly Budget: ',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                        ),
+                        Text(
+                          '£$remaining',
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                      ],
                     ),
-                    Text(
-                      '£$remaining',
-                      style: const TextStyle(fontSize: 20),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(25.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          'Total Expenses: ',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                        ),
+                        Text(
+                          '£$totalExpenses',
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
+                  BudgetSummary(
+                    budget: double.parse(budget),
+                    totalExpenses: double.parse(totalExpenses),
+                  ),
+                  const SizedBox(height: 15),
+                  Column(
+                    children: mutableCategories.map((category) {
+                      return ListTile(
+                        tileColor: CategoryColorManager.getCategoryColor(category),
+                        leading: Text(
+                          category,
+                          style: const TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),
+                        ),
+                        trailing: Text(
+                          '£${categoryTotals[category]?.toStringAsFixed(2) ?? "0.00"}',
+                          style: const TextStyle(color: Colors.black, fontSize: 13),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+              Positioned(
+                top: 45.0,
+                left: 5.0,
+                child: FloatingActionButton(
+                  backgroundColor: Colors.blue,
+                  onPressed: () => addBudget(),
+                  mini: true,
+                  child: const Icon(Icons.add, color: Colors.white,),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(25.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Total Expenses: ',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                    ),
-                    Text(
-                      '£$totalExpenses',
-                      style: const TextStyle(fontSize: 20),
-                    ),
-                  ],
-                ),
-              ),
-              BudgetSummary(
-                budget: double.parse(budget),
-                totalExpenses: double.parse(totalExpenses),
-              ),
-              const SizedBox(height: 15),
-              Column(
-                children: mutableCategories.map((category) {
-                  return ListTile(
-                    tileColor: CategoryColorManager.getCategoryColor(category),
-                    leading: Text(
-                      category,
-                      style: const TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),
-                    ),
-                    trailing: Text(
-                      '£${categoryTotals[category]?.toStringAsFixed(2) ?? "0.00"}',
-                      style: const TextStyle(color: Colors.black, fontSize: 13),
-                    ),
-                  );
-                }).toList(),
               ),
             ],
           );

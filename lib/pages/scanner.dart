@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:budget_app/Utils/image_picker_class.dart';
 import 'package:budget_app/models/image_picker.dart';
 import 'package:budget_app/pages/image_cropper_page.dart';
@@ -18,7 +16,7 @@ class _MyScannerPageState extends State<ScannerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Set the background color to white
+      backgroundColor: Colors.grey[200],
 
       body: Stack(
         children: [

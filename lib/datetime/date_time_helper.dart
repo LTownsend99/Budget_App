@@ -22,3 +22,15 @@ String convertDateTimeToString(DateTime dateTime)
 
   return yyyymmdd;
 }
+
+String getMonthFromDateTime(DateTime dateTime)
+{
+  String month = dateTime.month.toString();
+  if(month.length == 1)
+  {
+    // add a zero if its a single digit month
+    month = '0$month';
+  }
+
+  return month;
+}

@@ -25,7 +25,12 @@ class _PasscodePageState extends State<PasscodePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Passcode Screen'),
+        title: const Text(
+          'Passcode Screen',
+          style:
+              TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.blueAccent,
       ),
       backgroundColor: Colors.black26,
       body: Center(
@@ -37,7 +42,7 @@ class _PasscodePageState extends State<PasscodePage> {
               style: TextStyle(fontSize: 25, color: Colors.white),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 20), // Adding space between text and button
+            const SizedBox(height: 20), // Adding space between text and button
             _defaultLockScreenButton(context),
           ],
         ),

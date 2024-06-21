@@ -1,4 +1,4 @@
-import 'package:budget_app/graphs/bar_data.dart';
+import 'package:budget_app/graphs/daily_bar_data.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
@@ -25,7 +25,7 @@ class DailyBarGraph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    BarData barData = BarData(
+    DailyBarData dailyBarData = DailyBarData(
         mondayAmount: mondayAmount,
         tuesdayAmount: tuesdayAmount,
         wednesdayAmount: wednesdayAmount,
@@ -34,7 +34,7 @@ class DailyBarGraph extends StatelessWidget {
         saturdayAmount: saturdayAmount,
         sundayAmount: sundayAmount);
 
-    barData.initializeBarData();
+    dailyBarData.initializeBarData();
 
     return BarChart(BarChartData(
       maxY: 200,
@@ -52,7 +52,7 @@ class DailyBarGraph extends StatelessWidget {
       ),
       gridData: const FlGridData(show: false),
       borderData: FlBorderData(show: true),
-      barGroups: barData.barData
+      barGroups: dailyBarData.barData
           .map(
             (data) => BarChartGroupData(
               x: data.x,

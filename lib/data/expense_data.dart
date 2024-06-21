@@ -63,7 +63,7 @@ class ExpenseData extends ChangeNotifier {
     }
   }
 
-  // Get the date for the start of the week - always find the closest Sunday
+  // Get the date for the start of the week - always find the closest Monday
   DateTime startOfWeekDate() {
     DateTime? startOfWeek;
     DateTime today = DateTime.now();
@@ -76,6 +76,46 @@ class ExpenseData extends ChangeNotifier {
 
     return startOfWeek!;
   }
+
+  // Get month from a DateTime object
+  String getMonth(DateTime dateTime) {
+    switch (dateTime.month) {
+      case 1:
+        return 'January';
+      case 2:
+        return 'February';
+      case 3:
+        return 'March';
+      case 4:
+        return 'April';
+      case 5:
+        return 'May';
+      case 6:
+        return 'June';
+      case 7:
+        return 'July';
+      case 8:
+        return 'August';
+      case 9:
+        return 'September';
+      case 10:
+        return 'October';
+      case 11:
+        return 'November';
+      case 12:
+        return 'December';
+      default:
+        return '';
+    }
+  }
+
+  // Get the date for the start of the month
+  DateTime startOfMonthDate() {
+    DateTime today = DateTime.now();
+    DateTime startOfMonth = DateTime(today.year, today.month, 1);
+    return startOfMonth;
+  }
+
 
   // Convert overall list into daily summaries
   Map<String, double> calculateDailyExpenseSummary() {
@@ -101,15 +141,15 @@ class ExpenseData extends ChangeNotifier {
     Map<String, double> monthlyExpenseSummary = {};
 
     for (var expense in overallExpenses) {
-      String date = convertDateTimeToString(expense.dateTime);
+      String month = getMonthFromDateTime(expense.dateTime);
       double amount = double.parse(expense.amount);
 
-      if (monthlyExpenseSummary.containsKey(date)) {
-        double currentAmount = monthlyExpenseSummary[date]!;
+      if (monthlyExpenseSummary.containsKey(month)) {
+        double currentAmount = monthlyExpenseSummary[month]!;
         currentAmount += amount;
-        monthlyExpenseSummary[date] = currentAmount;
+        monthlyExpenseSummary[month] = currentAmount;
       } else {
-        monthlyExpenseSummary.addAll({date: amount});
+        monthlyExpenseSummary.addAll({month: amount});
       }
     }
     return monthlyExpenseSummary;

@@ -1,6 +1,6 @@
-import 'package:budget_app/graphs/individual_bar.dart';
+import 'package:budget_app/graphs/daily_individual_bar.dart';
 
-class BarData
+class DailyBarData
 {
   final double mondayAmount;
   final double tuesdayAmount;
@@ -10,7 +10,7 @@ class BarData
   final double saturdayAmount;
   final double sundayAmount;
 
-  BarData({
+  DailyBarData({
     required this.mondayAmount,
     required this.tuesdayAmount,
     required this.wednesdayAmount,
@@ -20,31 +20,31 @@ class BarData
     required this.sundayAmount
 });
 
-  List<IndividualBar> barData = [];
+  List<DailyIndividualBar> barData = [];
 
   void initializeBarData()
   {
     barData = [
       //Monday
-      IndividualBar(x: 0, y: mondayAmount),
+      DailyIndividualBar(x: 0, y: mondayAmount),
 
       //Tuesday
-      IndividualBar(x: 1, y: tuesdayAmount),
+      DailyIndividualBar(x: 1, y: tuesdayAmount),
 
       //Wednesday
-      IndividualBar(x: 2, y: wednesdayAmount),
+      DailyIndividualBar(x: 2, y: wednesdayAmount),
 
       //Thursday
-      IndividualBar(x: 3, y: thursdayAmount),
+      DailyIndividualBar(x: 3, y: thursdayAmount),
 
       //Friday
-      IndividualBar(x: 4, y: fridayAmount),
+      DailyIndividualBar(x: 4, y: fridayAmount),
 
       //Saturday
-      IndividualBar(x: 5, y: saturdayAmount),
+      DailyIndividualBar(x: 5, y: saturdayAmount),
 
       //Sunday
-      IndividualBar(x: 6, y: sundayAmount)
+      DailyIndividualBar(x: 6, y: sundayAmount)
     ];
   }
 }
