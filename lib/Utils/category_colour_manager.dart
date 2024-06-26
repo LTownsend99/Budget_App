@@ -8,10 +8,10 @@ class CategoryColorManager {
     'Utilities': Colors.red.shade100,
     'Savings': Colors.purple.shade100,
     'Other': Colors.yellow.shade100,
-    // Add more categories and corresponding colors as needed
+    // Can add more categories and corresponding colors as needed
   };
 
   static Color getCategoryColor(String category) {
-    return _categoryColors[category] ?? Colors.black; // Default color if category not found
+    return _categoryColors[category] ?? Colors.white; // Default color if category not found
   }
 }

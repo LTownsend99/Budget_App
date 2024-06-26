@@ -13,7 +13,7 @@ class PasscodePage extends StatefulWidget {
   State<PasscodePage> createState() => _PasscodePageState();
 }
 
-const storedPasscode = '123456';
+const storedPasscode = '123456';  // Passcode required to enter the app
 
 class _PasscodePageState extends State<PasscodePage> {
   final StreamController<bool> _verificationNotifier =

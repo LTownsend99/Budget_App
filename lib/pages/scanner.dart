@@ -23,43 +23,49 @@ class _MyScannerPageState extends State<ScannerPage> {
           Positioned(
             bottom: MediaQuery.of(context).size.height / 2 - 58, // Center vertically
             left: MediaQuery.of(context).size.width / 2 - 145, // Center horizontally
-            child: Container(
-              width: 300,
-              height: 50,
-              child: FloatingActionButton(
-                onPressed: () {
-                  imagePicker(context, onCameraTap: () {
-                    pickImage(ImageSource.camera).then((value) {
-                      if (value != '') {
-                        imageCropperView(value, context).then((value) {
+            child: Column(
+              children: [
+                Container(
+                  width: 300,
+                  height: 50,
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      imagePicker(context, onCameraTap: () {
+                        pickImage(ImageSource.camera).then((value) {
                           if (value != '') {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) =>
-                                        RecogniseImagePage(path: value)));
+                            imageCropperView(value, context).then((value) {
+                              if (value != '') {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) =>
+                                            RecogniseImagePage(path: value)));
+                              }
+                            });
                           }
                         });
-                      }
-                    });
-                  }, onGalleryTap: () {
-                    pickImage(ImageSource.gallery).then((value) {
-                      if (value != '') {
-                        imageCropperView(value, context).then((value) {
+                      }, onGalleryTap: () {
+                        pickImage(ImageSource.gallery).then((value) {
                           if (value != '') {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) =>
-                                        RecogniseImagePage(path: value)));
+                            imageCropperView(value, context).then((value) {
+                              if (value != '') {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) =>
+                                            RecogniseImagePage(path: value)));
+                              }
+                            });
                           }
                         });
-                      }
-                    });
-                  });
-                },
-                child: const Icon(Icons.photo_camera),
-              ),
+                      });
+                    },
+                    child: const Icon(Icons.photo_camera),
+                  ),
+                ),
+                const SizedBox(height: 8), // Space between FAB and hint text
+                const Text('Tap to pick an image', style: TextStyle(fontSize: 18)),
+              ],
             ),
           ),
         ],

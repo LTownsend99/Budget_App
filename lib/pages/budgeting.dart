@@ -1,6 +1,6 @@
 import 'package:budget_app/Utils/categories.dart';
 import 'package:budget_app/components/budget_summary.dart';
-import 'package:budget_app/components/category_colour_manager.dart';
+import 'package:budget_app/Utils/category_colour_manager.dart';
 import 'package:budget_app/data/budget_data.dart';
 import 'package:budget_app/data/expense_data.dart';
 import 'package:flutter/material.dart';
@@ -184,7 +184,8 @@ class _MyBudgetPageState extends State<BudgetingPage> {
                 ],
               ),
               Positioned(
-                top: 45.0,
+                // Position of FAB
+                top: 50.0,
                 left: 5.0,
                 child: FloatingActionButton(
                   backgroundColor: Colors.blue,

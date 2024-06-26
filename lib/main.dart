@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
       ],
       builder: (context, child) => const MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: PasscodePage(),
+        home: PasscodePage(), // Page that opens when the app is run
       ),
     );
   }
