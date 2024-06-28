@@ -229,7 +229,7 @@ class _RecogniseImagePageState extends State<RecogniseImagePage> {
       clear();
 
       // Navigate back to ScannerPage
-      Navigator.popUntil(context, (route) => route.isFirst);
+      Navigator.popUntil(context, (route) => route.isActive);
     } else {
       // Show an alert dialog if fields are empty
       showDialog(
