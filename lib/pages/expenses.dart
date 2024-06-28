@@ -24,6 +24,10 @@ class _MyExpensePageState extends State<ExpensesPage> {
       builder: (context, value, child) {
         String totalExpenses = value.getTotalExpenses().toStringAsFixed(2);
 
+        // Sort the expenses list by dateTime in descending order
+        List<ExpenseItem> sortedExpenses = value.getOverallExpenses()
+          ..sort((a, b) => b.dateTime.compareTo(a.dateTime));
+
         return ListView(
           children: [
             Padding(
@@ -33,8 +37,7 @@ class _MyExpensePageState extends State<ExpensesPage> {
                 children: [
                   const Text(
                     'Total Expenses: ',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 20),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
                   Text(
                     '£$totalExpenses',
@@ -53,14 +56,14 @@ class _MyExpensePageState extends State<ExpensesPage> {
                   ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: value.getOverallExpenses().length,
+                    itemCount: sortedExpenses.length,
                     itemBuilder: (context, index) => ExpenseTile(
-                      name: value.getOverallExpenses()[index].name,
-                      category: value.getOverallExpenses()[index].category,
-                      amount: value.getOverallExpenses()[index].amount,
-                      dateTime: value.getOverallExpenses()[index].dateTime,
+                      name: sortedExpenses[index].name,
+                      category: sortedExpenses[index].category,
+                      amount: sortedExpenses[index].amount,
+                      dateTime: sortedExpenses[index].dateTime,
                       deleteTapped: (p0) =>
-                          deleteExpense(value.getOverallExpenses()[index]),
+                          deleteExpense(sortedExpenses[index]),
                     ),
                   ),
                 ],
